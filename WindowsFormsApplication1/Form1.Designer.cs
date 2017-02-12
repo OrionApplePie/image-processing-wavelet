@@ -52,7 +52,7 @@
             this.buttonWaveletCompress = new System.Windows.Forms.Button();
             this.buttonWaveletDecompress = new System.Windows.Forms.Button();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
-            this.toolStripProgressBar1 = new System.Windows.Forms.ToolStripProgressBar();
+            this.ProgressBar1 = new System.Windows.Forms.ToolStripProgressBar();
             this.label1 = new System.Windows.Forms.Label();
             this.textBox1 = new System.Windows.Forms.TextBox();
             this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
@@ -270,6 +270,7 @@
             this.buttonYCbCr_recov.TabIndex = 9;
             this.buttonYCbCr_recov.Text = "<<< Восстановить из YCbCr";
             this.buttonYCbCr_recov.UseVisualStyleBackColor = true;
+            this.buttonYCbCr_recov.Click += new System.EventHandler(this.buttonYCbCr_recov_Click);
             // 
             // buttonWaveletCompress
             // 
@@ -289,26 +290,27 @@
             this.buttonWaveletDecompress.TabIndex = 11;
             this.buttonWaveletDecompress.Text = "<<< Декомпрессия";
             this.buttonWaveletDecompress.UseVisualStyleBackColor = true;
+            this.buttonWaveletDecompress.Click += new System.EventHandler(this.buttonWaveletDecompress_Click);
             // 
             // statusStrip1
             // 
             this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.toolStripProgressBar1});
-            this.statusStrip1.Location = new System.Drawing.Point(0, 580);
+            this.ProgressBar1});
+            this.statusStrip1.Location = new System.Drawing.Point(0, 609);
             this.statusStrip1.Name = "statusStrip1";
             this.statusStrip1.Size = new System.Drawing.Size(734, 22);
             this.statusStrip1.TabIndex = 12;
             this.statusStrip1.Text = "statusStrip1";
             // 
-            // toolStripProgressBar1
+            // ProgressBar1
             // 
-            this.toolStripProgressBar1.Name = "toolStripProgressBar1";
-            this.toolStripProgressBar1.Size = new System.Drawing.Size(100, 16);
+            this.ProgressBar1.Name = "ProgressBar1";
+            this.ProgressBar1.Size = new System.Drawing.Size(100, 16);
             // 
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(15, 454);
+            this.label1.Location = new System.Drawing.Point(15, 421);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(63, 13);
             this.label1.TabIndex = 13;
@@ -316,9 +318,10 @@
             // 
             // textBox1
             // 
-            this.textBox1.Location = new System.Drawing.Point(84, 454);
+            this.textBox1.Location = new System.Drawing.Point(18, 437);
+            this.textBox1.Multiline = true;
             this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(50, 20);
+            this.textBox1.Size = new System.Drawing.Size(150, 21);
             this.textBox1.TabIndex = 14;
             // 
             // openFileDialog1
@@ -345,7 +348,7 @@
             // 
             // tbImagePath
             // 
-            this.tbImagePath.Location = new System.Drawing.Point(18, 408);
+            this.tbImagePath.Location = new System.Drawing.Point(18, 398);
             this.tbImagePath.Name = "tbImagePath";
             this.tbImagePath.Size = new System.Drawing.Size(150, 20);
             this.tbImagePath.TabIndex = 17;
@@ -355,7 +358,7 @@
             this.AcceptButton = this.buttonLoadImage;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(734, 602);
+            this.ClientSize = new System.Drawing.Size(734, 631);
             this.Controls.Add(this.tbImagePath);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.label2);
@@ -416,7 +419,7 @@
         private System.Windows.Forms.Button buttonWaveletCompress;
         private System.Windows.Forms.Button buttonWaveletDecompress;
         private System.Windows.Forms.StatusStrip statusStrip1;
-        private System.Windows.Forms.ToolStripProgressBar toolStripProgressBar1;
+        private System.Windows.Forms.ToolStripProgressBar ProgressBar1;
         private System.Windows.Forms.PictureBox pbResult;
         private System.Windows.Forms.PictureBox pbLoad;
         private System.Windows.Forms.PictureBox pbRGB_B;
