@@ -9,15 +9,23 @@ namespace WindowsFormsApplication1
 {
     class Compression
     {
+        // Класс. реализующий методы для компресии битмап изображения
+        // с помощью Вейвлет-Преобразования Хоара (ВПХ)
+
         public Compression()
         {
-
         }
 
+        // размер до которого рекурсивно работает метод преобр. Хоара
+        const int MIN_BLOCK = 128;
+        // граница, значения меньше которой приравниваются к 0, лучше поставить =1
+        const int EPS_COMPRESS = 1;
+
+        //метод извлекающий RGB каналы из битмапа в массив 3х бимапов 
         public Bitmap[] PicToRGBchannels(Bitmap img)
         {
             // array of 3 bitmaps: 0 - Red, 1 - Green and 2 - Blue
-
+            //создание массива из 3х битмапов, соотв. 3х каналам R, G и B
             Bitmap[] channels = new Bitmap[3];
             for(int i=0;i<3;i++)
                 channels[i] = new Bitmap(img.Width, img.Height);
@@ -27,6 +35,8 @@ namespace WindowsFormsApplication1
             int width = img.Width;
             int heigth = img.Height;
 
+            // проходимся по картинк/е и извлекаем компоненты пикселей (R, G, B)
+            // и сохраняем в соответсвующий битмап из массива
             for(int i=0;i<width;i++)
                 for(int j=0;j<heigth;j++)
                 {
@@ -42,6 +52,9 @@ namespace WindowsFormsApplication1
                 }     
             return channels;
         }
+        
+        
+        //метод преобразования RGB каналов в 1 битмап
         public Bitmap RGBchannelsToPic(Bitmap[] channels)
         {
             int w = channels[0].Width;
@@ -63,7 +76,9 @@ namespace WindowsFormsApplication1
 
             return img; 
         }
-        //
+        
+        
+        //метод извлечения компонент Y, Cb и Cr 
         public Bitmap[] RGBtoYCbCr(Bitmap img)
         {
             int w = img.Width;
@@ -76,13 +91,12 @@ namespace WindowsFormsApplication1
                 components[i] = new Bitmap(w, h);
 
             // ITU-R BT.601
-            Color pix, pixG, pixB;
+            Color pix;
             byte Y, Cb, Cr;
 
             for(int i=0;i<w;i++)
                 for(int j=0;j<h;j++)
                 {
-       
                         pix = img.GetPixel(i, j);
 
                         Color nPix;
@@ -90,11 +104,6 @@ namespace WindowsFormsApplication1
                         Y = Convert.ToByte(16 + (65.481 * ((double)pix.R / 255.0)     + 128.553 * ((double)pix.G / 255.0) + 24.966 * ((double)pix.B / 255.0)));
                         Cb = Convert.ToByte(128 + (-37.797 * ((double)pix.R / 255.0)  - 74.203 * ((double)pix.G / 255.0) + 112.0 * ((double)pix.B / 255.0)));
                         Cr = Convert.ToByte(128 + (112.0 * ((double)pix.R / 255.0)    - 93.768 * ((double)pix.G / 255.0) - 18.214 * ((double)pix.B / 255.0)));
-
-
-                        //Y = (byte)(0 + (0.299 * pix.R + 0.587 * pix.G + 0.114 * pix.B));
-                        //Cb = (byte)(128 -  (0.168736 * pix.R - 0.331264 * pix.G + 0.5 * pix.B));
-                        //Cr = (byte)(128 + (0.5 * pix.R - 0.418688 * pix.G - 0.081312 * pix.B));
 
                         nPix = Color.FromArgb(Y, Y, Y);
                         components[0].SetPixel(i, j, nPix);
@@ -108,8 +117,8 @@ namespace WindowsFormsApplication1
 
             return components;
         }
-        //
-
+        
+        // метод который собирает из компонент Y, Cb и Cr RGB-битмап
         public Bitmap YCbCrYoRGB(Bitmap imgY, Bitmap imgCb, Bitmap imgCr)
         {
             int w = imgY.Width;
@@ -131,145 +140,50 @@ namespace WindowsFormsApplication1
 
                     pxl = Color.FromArgb((byte)R, (byte)G, (byte)B);
                     RGB.SetPixel(i, j, pxl);
-
                 }
-
             return RGB;
 
         }
 
-
-        public Bitmap hoar(Bitmap img, out int[,] map)
+        // Метод создает 2мерный массив из битмапа.
+        // R, G и B значения предполагаются равными (битмап - это YCbCr разложения)
+        public double[,] BitmapToDoubleArr(Bitmap img)
         {
             int w = img.Width;
             int h = img.Height;
-            map = new int[w, h];
-            Color p;
+            double[,] map = new double[w, h];
 
+            Color p;
             for (int i = 0; i < w; i++)
                 for (int j = 0; j < h; j++)
                 {
                     p = img.GetPixel(i, j);
-                    map[i, j] = p.R;
+                    map[i, j] = p.R; // they equal: R=G=B
                 }
-            //
-            using (System.IO.StreamWriter file =
-            new System.IO.StreamWriter(@"C:\cool\es2.txt"))
-            {
-
-                for (int i = 0; i < w; i++)
-                {
-                    for (int j = 0; j < h; j++)
-                    {
-                        file.Write(map[i, j] + " ");
-                    }
-                    file.WriteLine("");
-
-                }
-                file.Close();
-            }
-            //
-            //
-            for (int i = 0; i < w; i++)
-            {
-                int[] s = new int[w];
-                int tmp;
-                int ind = 0;
-                for (int j = 0; j < w; j+=2)
-                {
-                    s[ind] = map[i, j] + map[i, j + 1];
-                    ind++;
-                }
-                for (int j = 0; j < w; j += 2)
-                { 
-                    s[ind] = map[i, j] - map[i, j + 1];
-                    ind++;
-                }
-                ind = 0;
-                for(int j =0; j<w;j++)
-                    map[i,j] = s[j];
-
-            }
-            using (System.IO.StreamWriter file =
-          new System.IO.StreamWriter(@"C:\cool\es2.txt", true))
-            {
-                file.WriteLine("--------------------");
-
-                for (int i = 0; i < w; i++)
-                {
-                    for (int j = 0; j < h; j++)
-                    {
-                        file.Write(map[i, j] + " ");
-                    }
-                    file.WriteLine("");
-
-                }
-                file.Close();
-            }
-            // for columns
-            for (int i = 0; i < w; i++)
-            {
-                int[] s = new int[h];
-                int ind = 0;
-                for (int j = 0; j < h; j += 2)
-                {
-                    s[ind] = map[j, i] + map[j+1, i];
-                    ind++;
-                }
-                for (int j = 0; j < h; j += 2)
-                {
-                    s[ind] = map[j, i] - map[j+1, i];
-                    ind++;
-                }
-                ind = 0;
-                for (int j = 0; j < w; j++)
-                    map[j, i] = s[j];
-
-            }
-
-            using (System.IO.StreamWriter file =
-           new System.IO.StreamWriter(@"C:\cool\es2.txt", true))
-            {
-                file.WriteLine("------------------++++++-----------------");
-                for (int i = 0; i < w; i++)
-                {
-                    for (int j = 0; j < h; j++)
-                    {
-                        file.Write(String.Format("{0,5:0}", map[i, j]));
-                    }
-                    file.WriteLine("");
-                }
-                file.Close();
-            }
-
-            Bitmap b = new Bitmap(w, h);
-            float pp;
-            for (int i = 0; i < w; i++)
-                for (int j = 0; j < h; j++)
-                {
-                    
-                    pp = map[i, j]/4.0F;
-                    float eps = 25F;
-                    if (Math.Abs(pp) <= eps) pp = 0; // compression!?!?!
-                    pp = (255 + pp) % 255;
-                   // if (pp <= 0.5) pp = 0; // compression!?!?!
-                    //b.SetPixel(i, j, Color.FromArgb((int)pp, (int)pp, (int)pp));
-                    b.SetPixel(i, j, Color.FromArgb((int)pp, (int)pp, (int)pp));
-
-                }
-            return b;
+            return map;
         }
-        //override recursion hoar
+
+        // Метод реализующий вейвлет преобразование Хоара. Рекурсивный.
+        // w и h - соответствуют ширине и высоте в пикселях исходного изображения.
+        // Текущая версия работает только при w = h, и w и h должны быть степенями двойки ( 128, 25, 512  и тд).
+        // Битмап предварительно необходимо перевести в двумерныц массив чисел типа double.
+        // 
         public double[,] hoar(double[,] map, int w, int h)
         { 
+            // указыают когда закончить рекурсивно обрабатывать массив
+            
             int min_w, min_h;
-            min_w = 128;
-            min_h = 128;   
- 
+            min_w = MIN_BLOCK;
+            min_h = MIN_BLOCK;   
+                 
+            //вычисление полусумм и полуразностей соглсно формулам
+            //проход по строкам
+
             for (int i = 0; i < w; i++)
             {
                 double[] s = new double[w];
                 int ind = 0;
+              
                 for (int j = 0; j < w; j += 2)
                 {
                     s[ind] = ( map[i, j] + map[i, j + 1])/2.0;
@@ -283,10 +197,9 @@ namespace WindowsFormsApplication1
                 ind = 0;
                 for (int j = 0; j < w; j++)
                     map[i, j] = s[j];
-
             }
           
-            // for columns
+            // проход по столбцам
             for (int i = 0; i < w; i++)
             {
                 double[] s = new double[h];
@@ -307,30 +220,21 @@ namespace WindowsFormsApplication1
 
             }
 
+            // если размер все еще больше минимального - то продолжить рекурсивный вызов
             if(w > min_w)
             {
-                double[,]  res = hoar(map, w / 2, h / 2);  
+                //передать массив и половины ширины и высоты ( согласно алгоритму ВПХ )
+                double[,]  res = hoar(map, w / 2, h / 2);
+                // и вернуть   
                 return res;
             }
+            // иначе вернуть вычисленное в циклах выше
             return map;
         }
-        //
-        public double[,] BitmapToDoubleArr(Bitmap img)
-        {
-            int w = img.Width;
-            int h = img.Height;
-            double[,] map = new double[w, h];
 
-            Color p;
-            for (int i = 0; i < w; i++)
-                for (int j = 0; j < h; j++)
-                {
-                    p = img.GetPixel(i, j);
-                    map[i, j] = p.R; // they equal: R=G=B
-                }
-            return map;
-        }
-        //
+       
+        // Метод который создает битмап из 2-мерного массива чисел типа double.
+        // Все элементы которые по модулю меньше EPS_COMPRESS заменяются нулем.
         public Bitmap DoubleArrToBitmapCompression(double[,] map)
         {
             int w = map.GetLength(0);
@@ -341,104 +245,21 @@ namespace WindowsFormsApplication1
                 for (int j = 0; j < h; j++)
                 {
                     pp = map[i, j];
-                    double eps = 1.0;
+                    double eps = EPS_COMPRESS;
                     if (Math.Abs(pp) <= eps) pp = 0; // compression!?!?!
+                    
+                    // На случай если значение отрицательное
                     pp = (255 + pp) % 255;
-                    // if (pp <= 0.5) pp = 0; // compression!?!?!
-                    //b.SetPixel(i, j, Color.FromArgb((int)pp, (int)pp, (int)pp));
+
                     b.SetPixel(i, j, Color.FromArgb((int)pp, (int)pp, (int)pp));
                 }
             return b;
         }
-        //
 
-        //override only by bitmap
-        public Bitmap reverthoar(Bitmap img)
-        {
-
-            int w = img.Width;
-            int h = img.Height;
-            int[,] map = new int[w, h];
-            Color p;
-            
-            for (int i = 0; i < w; i++)
-                for (int j = 0; j < h; j++)
-                {
-                    p = img.GetPixel(i, j);
-                    map[i, j] = (p.R * 4);
-                }
-            //
-            // for columns
-            for (int i = 0; i < w; i++)
-            {
-                int[] s = new int[h];
-                int ind = 0;
-                for (int j = 0; j < h / 2; j++)
-                {
-                    s[ind] = (map[j, i] + map[j + h / 2, i]) / 2;
-                    s[ind + 1] = (map[j, i] - map[j + h / 2, i]) / 2;
-                    ind += 2;
-                }
-                ind = 0;
-                for (int j = 0; j < w; j++)
-                    map[j, i] = s[j];
-
-            }
-            //for rows
-            for (int i = 0; i < w; i++)
-            {
-                int[] s = new int[h];
-                int ind = 0;
-                for (int j = 0; j < h / 2; j++)
-                {
-                    s[ind] = (map[i, j] + map[i, j + h / 2]) / 2;
-                    s[ind + 1] = (map[i, j] - map[i, j + h / 2]) / 2;
-                    ind += 2;
-                }
-                ind = 0;
-                for (int j = 0; j < w; j++)
-                    map[i, j] = s[j];
-
-            }
-            //
-            using (System.IO.StreamWriter file =
-         new System.IO.StreamWriter(@"C:\cool\es2.txt", true))
-            {
-                file.WriteLine("------------------+++%%%*****%%%+++-----------------");
-                for (int i = 0; i < w; i++)
-                {
-                    for (int j = 0; j < h; j++)
-                    {
-                        file.Write(String.Format("{0,5:0}", (byte)map[i, j]));
-                    }
-                    file.WriteLine("");
-                }
-                file.Close();
-            }
-            //
-
-            Bitmap b = new Bitmap(w, h);
-            float pp;
-            for (int i = 0; i < w; i++)
-                for (int j = 0; j < h; j++)
-                {
-
-                    pp = map[i, j];
-                    
-                    //pp = (255 + pp) % 255;
-
-                    b.SetPixel(i, j, Color.FromArgb((byte)pp, (byte)pp, (byte)pp));
-
-                }
-            return b;
-        }
-        //
-        //
-        // recursion!!!
+        // Метод реализующий обратное преобразование Хоара.
+        // При первом вызове передаются миниальные размеры.
         public double[,] reverthoar(double[,] map, int w, int h)
         {
-            int end = 0;
-
                 // for columns
                 for (int i = 0; i < w; i++)
                 {
@@ -470,8 +291,7 @@ namespace WindowsFormsApplication1
                     for (int j = 0; j < w; j++)
                         map[i, j] = s[j];
                 }
-                //
-
+    
                 if(w*2 > map.GetLength(0))
                 {
                     return map;
@@ -479,6 +299,9 @@ namespace WindowsFormsApplication1
                 double[,] res = reverthoar(map, w * 2, h * 2);
                 return res;
             }
+
+        // Метод преобразующий массив в битмап. Применяется после обратного ВПХ.
+
         public Bitmap ArrDoubleToBitmapDecompress(double[,] map)
         {
             int w = map.GetLength(0);
@@ -491,10 +314,15 @@ namespace WindowsFormsApplication1
                 {
                     pp = map[i, j];
                     //pp = (255 + pp) % 255;
-                    b.SetPixel(i, j, Color.FromArgb((byte)pp, (byte)pp, (byte)pp)); //!!!
+                    b.SetPixel(i, j, Color.FromArgb((byte)pp, (byte)pp, (byte)pp));
                 }
             return b;
         }
+
+        // Методы где собраны все методы для компрессии и декомпрессии.
+
+        // Компрессия. Принимает на вход одну из компонент YCbCR-разложения и
+        // применяет ВПХ. На выходе битмап.
         public Bitmap hoar_recu(Bitmap img)
         {
             double[,] map = BitmapToDoubleArr(img);
@@ -504,12 +332,12 @@ namespace WindowsFormsApplication1
             Bitmap res = DoubleArrToBitmapCompression(wvlt);
             return res;
         }
-        //
+
+        // Декомпрессия.
         public Bitmap revert_hoar_recu(Bitmap img)
         {
-            double[,] map = BitmapToDoubleArr(img);
-          
-            double[,] wvlt_decomp = reverthoar(map, 128, 128);
+            double[,] map = BitmapToDoubleArr(img); 
+            double[,] wvlt_decomp = reverthoar(map, MIN_BLOCK, MIN_BLOCK);
             Bitmap res = ArrDoubleToBitmapDecompress(wvlt_decomp);
             return res;
         }

@@ -38,6 +38,11 @@ namespace WindowsFormsApplication1
            
         }
 
+        private void label1_Click(object sender, EventArgs e)
+        {
+
+        }
+
         //
         public static void Compress(DirectoryInfo directorySelected)
         {
@@ -71,7 +76,6 @@ namespace WindowsFormsApplication1
             {
                 picRes = comp.YCbCrYoRGB(YcbCrComponents[0], YcbCrComponents[1], YcbCrComponents[2]);
                 gPicRes.DrawImage(picRes, 0, 0, pbResult.Width, pbResult.Height);
-
             }
         }
 
@@ -82,10 +86,9 @@ namespace WindowsFormsApplication1
                 YcbCrComponents[0] = comp.revert_hoar_recu(W1);
                 YcbCrComponents[1] = comp.revert_hoar_recu(W2);
                 YcbCrComponents[2] = comp.revert_hoar_recu(W3);
-                //
-                YcbCrComponents[0].Save(@"C:\cool\YCbCr_compon1_after_decomp.bmp");
-
-
+          
+                //YcbCrComponents[0].Save(@"C:\cool\YCbCr_compon1_after_decomp.bmp");
+     
                 gYCbCr_1.DrawImage(YcbCrComponents[0], 0, 0, pbYCbCr_1.Width, pbYCbCr_1.Height);
                 gYCbCr_2.DrawImage(YcbCrComponents[1], 0, 0, pbYCbCr_2.Width, pbYCbCr_2.Height);
                 gYCbCr_3.DrawImage(YcbCrComponents[2], 0, 0, pbYCbCr_3.Width, pbYCbCr_3.Height);
@@ -96,10 +99,8 @@ namespace WindowsFormsApplication1
 
         private void buttonWaveletCompress_Click(object sender, EventArgs e)
         {
-            YcbCrComponents[0].Save(@"C:\cool\YcbCr_compon1.bmp");
-            //W1 = comp.hoar(YcbCrComponents[0], out map1);
-            // W2 = comp.hoar(YcbCrComponents[1], out map2);
-            // W3 = comp.hoar(YcbCrComponents[2], out map3);
+            //YcbCrComponents[0].Save(@"C:\cool\YcbCr_compon1.bmp");
+
             W1 = comp.hoar_recu(YcbCrComponents[0]);
             W2 = comp.hoar_recu(YcbCrComponents[1]);
             W3 = comp.hoar_recu(YcbCrComponents[2]);
@@ -112,10 +113,7 @@ namespace WindowsFormsApplication1
             W1.Save(@"C:\cool\tmp\wavelet1.bmp", ImageFormat.Bmp);
             W2.Save(@"C:\cool\tmp\wavelet2.bmp", ImageFormat.Bmp);
             W3.Save(@"C:\cool\tmp\wavelet3.bmp", ImageFormat.Bmp);
-            // DirectoryInfo dir = new DirectoryInfo(@"C:\cool\tmp\");
-            //Compress(dir);
-            //var ofileLength = new FileInfo(path).Length;
-
+    
             using (ZipFile zip = new ZipFile())
             {
                 zip.AddDirectory(@"C:\cool\tmp\");
@@ -124,14 +122,13 @@ namespace WindowsFormsApplication1
                 var ms = new MemoryStream();
                 zip.Save(ms);
                 zipsize = ms.Length;
-                // calculate original bitmap size in bytes
-               
+                // calculate original bitmap size in bytes          
                 long orig_size = picOriginal.Width * picOriginal.Height * 3;
                 textBox1.Text = Convert.ToString((double)orig_size/zipsize);
             }
         }
 
-        //
+
         public MainForm()
         {
             InitializeComponent();
@@ -152,7 +149,6 @@ namespace WindowsFormsApplication1
             gWavelet_1 = pbWavelet_1.CreateGraphics();
             gWavelet_2 = pbWavelet_2.CreateGraphics();
             gWavelet_3 = pbWavelet_3.CreateGraphics();
-
 
             gPicOriginal.Clear(bg_col);
             gPicRes.Clear(bg_col);
@@ -194,10 +190,6 @@ namespace WindowsFormsApplication1
                 picRes = comp.RGBchannelsToPic(RGBchannels);
                 gPicRes.DrawImage(picRes, 0, 0, pbResult.Width, pbResult.Height);
             }
-        }
-
-        private void Form1_Load(object sender, EventArgs e)
-        {           
         }
 
         private void buttonLoadImage_Click(object sender, EventArgs e)

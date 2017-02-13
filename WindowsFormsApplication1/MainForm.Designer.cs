@@ -312,9 +312,10 @@
             this.label1.AutoSize = true;
             this.label1.Location = new System.Drawing.Point(15, 421);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(63, 13);
+            this.label1.Size = new System.Drawing.Size(125, 13);
             this.label1.TabIndex = 13;
-            this.label1.Text = "Сжато раз:";
+            this.label1.Text = "Сжато раз ( BMP / zip ):";
+            this.label1.Click += new System.EventHandler(this.label1_Click);
             // 
             // textBox1
             // 
@@ -381,7 +382,6 @@
             this.MaximizeBox = false;
             this.Name = "MainForm";
             this.Text = "Image Compressor ver. 0.555 by Alexander Ten";
-            this.Load += new System.EventHandler(this.Form1_Load);
             this.gbLoadImage.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.pbResult)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pbLoad)).EndInit();
