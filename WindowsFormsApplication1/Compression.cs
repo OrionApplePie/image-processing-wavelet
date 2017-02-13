@@ -19,7 +19,7 @@ namespace WindowsFormsApplication1
         // размер до которого рекурсивно работает метод преобр. Хоара
         const int MIN_BLOCK = 128;
         // граница, значения меньше которой приравниваются к 0, лучше поставить =1
-        const int EPS_COMPRESS = 1;
+        const double EPS_COMPRESS = 0.05;
 
         //метод извлекающий RGB каналы из битмапа в массив 3х бимапов 
         public Bitmap[] PicToRGBchannels(Bitmap img)
@@ -247,11 +247,13 @@ namespace WindowsFormsApplication1
                     pp = map[i, j];
                     double eps = EPS_COMPRESS;
                     if (Math.Abs(pp) <= eps) pp = 0; // compression!?!?!
-                    
-                    // На случай если значение отрицательное
-                    pp = (255 + pp) % 255;
 
-                    b.SetPixel(i, j, Color.FromArgb((int)pp, (int)pp, (int)pp));
+                    // На случай если значение отрицательное
+                    //pp = (255 + pp) % 255;
+
+                    // b.SetPixel(i, j, Color.FromArgb((int)pp, (int)pp, (int)pp));
+                    b.SetPixel(i, j, Color.FromArgb((byte)pp, (byte)pp, (byte)pp));
+
                 }
             return b;
         }

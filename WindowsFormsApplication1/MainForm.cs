@@ -30,46 +30,14 @@ namespace WindowsFormsApplication1
         Bitmap[] RGBchannels = new Bitmap[3];
         Bitmap[] YcbCrComponents;
 
-        int[,] map1, map2, map3;
-        private static string directoryPath = @"c:\cool\tmp\";
-
         private void button1_Click(object sender, EventArgs e)
         {
-           
         }
 
         private void label1_Click(object sender, EventArgs e)
         {
-
         }
-
         //
-        public static void Compress(DirectoryInfo directorySelected)
-        {
-            foreach (FileInfo fileToCompress in directorySelected.GetFiles())
-            {
-                using (FileStream originalFileStream = fileToCompress.OpenRead())
-                {
-                    if ((File.GetAttributes(fileToCompress.FullName) &
-                       FileAttributes.Hidden) != FileAttributes.Hidden & fileToCompress.Extension != ".gz")
-                    {
-                        using (FileStream compressedFileStream = File.Create(fileToCompress.FullName + ".gz"))
-                        {
-                            using (GZipStream compressionStream = new GZipStream(compressedFileStream,
-                               CompressionMode.Compress))
-                            {
-                                originalFileStream.CopyTo(compressionStream);
-
-                            }
-                        }
-                        //FileInfo info = new FileInfo(directoryPath + "\\" + fileToCompress.Name + ".gz");
-                       
-                    }
-
-                }
-            }
-        }
-
         private void buttonYCbCr_recov_Click(object sender, EventArgs e)
         {
             if (YcbCrComponents[0] != null)
@@ -180,7 +148,50 @@ namespace WindowsFormsApplication1
 
         private void buttonExit_Click(object sender, EventArgs e)
         {
-            this.Close();
+            if(picRes!=null)
+            { 
+            SaveFileDialog savedialog = new SaveFileDialog();
+            savedialog.Title = "Сохранить изображение как ...";
+            savedialog.OverwritePrompt = true;
+            savedialog.CheckPathExists = true;
+            savedialog.Filter =
+                "Bitmap File(*.bmp)|*.bmp|" +
+                "GIF File(*.gif)|*.gif|" +
+                "JPEG File(*.jpg)|*.jpg|" +
+                "TIF File(*.tif)|*.tif|" +
+                "PNG File(*.png)|*.png";
+            savedialog.ShowHelp = true;
+                // If selected, save
+                if (savedialog.ShowDialog() == DialogResult.OK)
+                {
+                    // Get the user-selected file name
+                    string fileName = savedialog.FileName;
+                    // Get the extension
+                    string strFilExtn =
+                        fileName.Remove(0, fileName.Length - 3);
+                    // Save file
+                    switch (strFilExtn)
+                    {
+                        case "bmp":
+                            picRes.Save(fileName, System.Drawing.Imaging.ImageFormat.Bmp);
+                            break;
+                        case "jpg":
+                            picRes.Save(fileName, System.Drawing.Imaging.ImageFormat.Jpeg);
+                            break;
+                        case "gif":
+                            picRes.Save(fileName, System.Drawing.Imaging.ImageFormat.Gif);
+                            break;
+                        case "tif":
+                            picRes.Save(fileName, System.Drawing.Imaging.ImageFormat.Tiff);
+                            break;
+                        case "png":
+                            picRes.Save(fileName, System.Drawing.Imaging.ImageFormat.Png);
+                            break;
+                        default:
+                            break;
+                    }
+                }
+            }
         }
 
         private void buttonRGBrecov_Click(object sender, EventArgs e)

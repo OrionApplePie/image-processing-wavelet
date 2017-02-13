@@ -224,11 +224,11 @@
             // 
             // buttonExit
             // 
-            this.buttonExit.Location = new System.Drawing.Point(12, 518);
+            this.buttonExit.Location = new System.Drawing.Point(12, 503);
             this.buttonExit.Name = "buttonExit";
             this.buttonExit.Size = new System.Drawing.Size(162, 52);
             this.buttonExit.TabIndex = 5;
-            this.buttonExit.Text = "Выход";
+            this.buttonExit.Text = "Сохранить";
             this.buttonExit.UseVisualStyleBackColor = true;
             this.buttonExit.Click += new System.EventHandler(this.buttonExit_Click);
             // 
